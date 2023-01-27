@@ -47,38 +47,43 @@ type Defaulter struct {
 
 // podAnnotator adds an annotation to every incoming pods.
 func (r *Defaulter) Handle(ctx context.Context, req admission.Request) admission.Response {
-	klog.Infof("Webhook is invoked by OperandRequest %s/%s", req.AdmissionRequest.Namespace, req.AdmissionRequest.Name)
+	if !r.IsLeafNamespace {
+		klog.Infof("Webhook is invoked by OperandRequest %s/%s", req.AdmissionRequest.Namespace, req.AdmissionRequest.Name)
 
-	opreq := &odlm.OperandRequest{}
+		opreq := &odlm.OperandRequest{}
 
-	err := r.decoder.Decode(req, opreq)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
+		err := r.decoder.Decode(req, opreq)
+		if err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
+
+		copy := opreq.DeepCopy()
+
+		r.Default(copy)
+
+		marshaledCopy, err := json.Marshal(copy)
+		if err != nil {
+			return admission.Errored(http.StatusInternalServerError, err)
+		}
+		marshaledOpreq, err := json.Marshal(opreq)
+		if err != nil {
+			return admission.Errored(http.StatusInternalServerError, err)
+		}
+
+		return admission.PatchResponseFromRaw(marshaledOpreq, marshaledCopy)
+	} else {
+		return admission.Allowed("The webhook is under leaf Namespace")
 	}
 
-	copy := opreq.DeepCopy()
-
-	r.Default(copy)
-
-	marshaledCopy, err := json.Marshal(copy)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-	marshaledOpreq, err := json.Marshal(opreq)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
-	return admission.PatchResponseFromRaw(marshaledOpreq, marshaledCopy)
 }
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Defaulter) Default(instance *odlm.OperandRequest) {
 	for i, req := range instance.Spec.Requests {
-		regNs := req.RegistryNamespace
-		if regNs == "" {
-			regNs = instance.Namespace
+		if req.RegistryNamespace == "" {
+			continue
 		}
+		regNs := req.RegistryNamespace
 		isDefaulting := false
 		// watchNamespace is empty in All namespace mode
 		if len(r.Bootstrap.CSData.WatchNamespaces) == 0 {
@@ -89,7 +94,7 @@ func (r *Defaulter) Default(instance *odlm.OperandRequest) {
 			}
 			if err := r.Client.Get(ctx, nsKey, ns); err != nil {
 				if errors.IsNotFound(err) {
-					klog.Infof("Not found registrySamespace %v for OperandRequest %v/%v", regNs, instance.Namespace, instance.Name)
+					klog.Infof("Not found registryNamespace %v for OperandRequest %v/%v", regNs, instance.Namespace, instance.Name)
 					isDefaulting = true
 				} else {
 					klog.Errorf("Failed to get namespace %v: %v", regNs, err)

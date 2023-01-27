@@ -149,21 +149,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	klog.Infof("Creating CommonService CR in the namespace %s", bs.CSData.OperatorNs)
-	if err = bs.CreateCsCR(); err != nil {
-		klog.Errorf("Failed to create CommonService CR: %v", err)
-		os.Exit(1)
-	}
+	if !bs.IsLeafNamespace {
+		klog.Infof("Creating CommonService CR in the namespace %s", bs.CSData.OperatorNs)
+		if err = bs.CreateCsCR(); err != nil {
+			klog.Errorf("Failed to create CommonService CR: %v", err)
+			os.Exit(1)
+		}
 
-	// Check IAM pods status
-	go goroutines.CheckIamStatus(bs)
-	// Create or Update CPP configuration
-	go goroutines.CreateUpdateConfig(bs)
-	// Update CS CR Status
-	go goroutines.UpdateCsCrStatus(bs)
-	if NSSCMSyncEnabled {
-		// Sync up NSS ConfigMap
-		go goroutines.SyncUpNSSConfigMap(bs)
+		// Check IAM pods status
+		go goroutines.CheckIamStatus(bs)
+		// Create or Update CPP configuration
+		go goroutines.CreateUpdateConfig(bs)
+		// Update CS CR Status
+		go goroutines.UpdateCsCrStatus(bs)
+		if NSSCMSyncEnabled {
+			// Sync up NSS ConfigMap
+			go goroutines.SyncUpNSSConfigMap(bs)
+		}
+	} else {
+		klog.Info("Operator is under leaf Namespace, do nothing...")
 	}
 
 	if err = (&controllers.CommonServiceReconciler{

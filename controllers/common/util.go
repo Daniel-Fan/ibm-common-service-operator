@@ -332,6 +332,33 @@ func GetCmOfMapCs(r client.Reader) (*corev1.ConfigMap, error) {
 	return csConfigmap, nil
 }
 
+// GetCmOfTopology gets ConfigMap of ibm topology
+func GetCmOfTopology(r client.Reader) (*corev1.ConfigMap, error) {
+	cmName := "ibm-topology-config"
+	cmNs, err := GetOperatorNamespace()
+	if err != nil {
+		return nil, err
+	}
+	topologyConfigmap := &corev1.ConfigMap{}
+	err = r.Get(context.TODO(), types.NamespacedName{Name: cmName, Namespace: cmNs}, topologyConfigmap)
+	if err != nil {
+		return nil, err
+	}
+	return topologyConfigmap, nil
+}
+
+// IsLeafNamespace check if oeprator namespace is leaf namespace
+func IsLeafNamespace(r client.Reader) bool {
+	cm, err := GetCmOfTopology(r)
+	if err != nil {
+		return false
+	}
+	if cm.Data["leafNamespace"] == "true" {
+		return true
+	}
+	return false
+}
+
 // CheckStorageClass gets StorageClassList in current cluster, then validates whether StorageClass created
 func CheckStorageClass(r client.Reader) error {
 	csStorageClass := &storagev1.StorageClassList{}

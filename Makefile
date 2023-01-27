@@ -73,7 +73,7 @@ else
 ARTIFACTORYA_REGISTRY ?= "hyc-cloud-private-scratch-docker-local.artifactory.swg-devops.com/ibmcom"
 endif
 
-REGISTRY ?= "hyc-cloud-private-scratch-docker-local.artifactory.swg-devops.com/ibmcom"
+REGISTRY ?= "quay.io/daniel_fan"
 
 # Current Operator image name
 OPERATOR_IMAGE_NAME ?= common-service-operator
@@ -210,7 +210,7 @@ cleanup-bundle:
 	oc get csv -o custom-columns=":metadata.name" --no-headers | xargs oc delete csv
 
 build-catalog-source:
-	opm -u docker index add --bundles $(QUAY_REGISTRY)/$(BUNDLE_IMAGE_NAME):$(VERSION) --tag $(QUAY_REGISTRY)/$(OPERATOR_IMAGE_NAME)-catalog:$(VERSION)
+	opm -u docker index add --bundles $(QUAY_REGISTRY)/$(BUNDLE_IMAGE_NAME):dev --tag $(QUAY_REGISTRY)/$(OPERATOR_IMAGE_NAME)-catalog:$(VERSION)
 	docker push $(QUAY_REGISTRY)/$(OPERATOR_IMAGE_NAME)-catalog:$(VERSION)
 
 update-csv-image: # updates operator image in currently deployed Common Service Operator

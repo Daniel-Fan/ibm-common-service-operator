@@ -24,7 +24,7 @@ metadata:
     containerImage: icr.io/cpopen/common-service-operator:latest
     createdAt: "2020-10-19T21:38:33Z"
     description: The IBM Common Service Operator is used to deploy IBM Common Services
-    nss.operator.ibm.com/managed-operators: cloud-native-postgresql
+    nss.operator.ibm.com/managed-operators: cloud-native-postgresql,ibm-common-service-operator,ibm-commonui-operator,ibm-iam-operator,ibm-ingress-nginx-operator,ibm-management-ingress-operator,ibm-mongodb-operator,ibm-zen-operator,ibm-odlm
     olm.skipRange: ">=3.3.0 <4.0.0"
     operatorChannel: v4.0
     operatorVersion: 4.0.0
@@ -271,7 +271,7 @@ spec:
                         value: icr.io/cpopen/cpfs/ibm-secretshare-operator:1.19.0
                       - name: IBM_ZEN_OPERATOR_IMAGE
                         value: icr.io/cpopen/ibm-zen-operator:1.7.0
-                    image: icr.io/cpopen/common-service-operator:latest
+                    image: quay.io/daniel_fan/common-service-operator-amd64:dev
                     imagePullPolicy: Always
                     livenessProbe:
                       failureThreshold: 10

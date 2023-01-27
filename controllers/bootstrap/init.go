@@ -72,6 +72,7 @@ type Bootstrap struct {
 	*deploy.Manager
 	SaasEnable           bool
 	MultiInstancesEnable bool
+	IsLeafNamespace      bool
 	CSOperators          []CSOperator
 	CSData               apiv3.CSData
 }
@@ -135,6 +136,7 @@ func NewBootstrap(mgr manager.Manager) (bs *Bootstrap, err error) {
 		Manager:              deploy.NewDeployManager(mgr),
 		SaasEnable:           util.CheckSaas(mgr.GetAPIReader()),
 		MultiInstancesEnable: util.CheckMultiInstances(mgr.GetAPIReader()),
+		IsLeafNamespace:      util.IsLeafNamespace(mgr.GetAPIReader()),
 		CSData:               csData,
 	}
 
@@ -329,7 +331,25 @@ func (b *Bootstrap) CreateCsCR() error {
 	_, err := b.GetObject(cs)
 	if errors.IsNotFound(err) { // Only if it's a fresh install
 		// Fresh Intall: No ODLM and NO CR
-		return b.CreateOrUpdateFromYaml([]byte(util.Namespacelize(constant.CsCR, placeholder, b.CSData.OperatorNs)))
+		if len(b.CSData.WatchNamespaces) == 0 {
+			// All Namespaces Mode:
+			// using `ibm-common-services` ns as ServicesNs if it exists
+			// Otherwise, do not create default CR
+			ctx := context.Background()
+			ns := &corev1.Namespace{}
+			nsKey := types.NamespacedName{
+				Name: constant.MasterNamespace,
+			}
+			if err := b.Client.Get(ctx, nsKey, ns); err != nil {
+				if errors.IsNotFound(err) {
+					klog.Warningf("Not found well-known default namespace %v, please manually create the namespace or create a CommonService CR in the namespace where you would like to deploy foundational services", constant.MasterNamespace, b.CSData.OperatorNs)
+					return nil
+				} else {
+					b.CSData.ServicesNs = constant.MasterNamespace
+				}
+			}
+		}
+		return b.renderTemplate(constant.CsCR, b.CSData)
 	} else if err != nil {
 		return err
 	}
