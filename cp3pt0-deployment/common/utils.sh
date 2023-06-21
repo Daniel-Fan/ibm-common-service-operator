@@ -1056,3 +1056,12 @@ function debug1() {
        debug "${1}"
     fi
 }
+
+# check_catalogsource check if the given catalogsource is available for selected packagemanifest and channel
+function check_catalogsource() {
+    oc get packagemanifest --selector='status.catalogsource=opencloud-operators-old,status.catalogSourceNamespace=openshift-marketplace,status.packageName=ibm-common-service-operator' -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | xargs -I {} oc get packagemanifest {} -o json | jq '.status.channels[] | select(.name == "v4.0")'
+}
+
+oc get packagemanifest -o yaml | yq eval '.items[] | select(.status.catalogSource == "opencloud-operators" and .status.catalogSourceNamespace == "openshift-marketplace" and .status.packageName == "ibm-common-service-operator" and .status.channels[].name == "v4.0") | .metadata.name'
+
+oc get packagemanifest -o yaml | yq eval '.items[] | select(.status.catalogSource == "opencloud-operators" and .status.catalogSourceNamespace == "openshift-marketplace" and .status.packageName == "ibm-common-service-operator") | {"name":.metadata.name, "defaultChannel": .status.defaultChannel}'
