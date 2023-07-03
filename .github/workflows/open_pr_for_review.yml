@@ -20,7 +20,7 @@ jobs:
 
       - name: Create PR
         run: |
-          git checkout -b scripts-dev
+          git checkout scripts-dev
           timestamp=$(date +%Y-%m-%d-%H-%M-%S)
           message="common service installer automation on $timestamp"
           hub pull-request -b scripts-adopter -h scripts-dev -m "$message"
