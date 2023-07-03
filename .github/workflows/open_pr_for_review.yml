@@ -23,4 +23,8 @@ jobs:
           git checkout scripts-dev
           timestamp=$(date +%Y-%m-%d-%H-%M-%S)
           message="common service installer automation on $timestamp"
-          hub pull-request -b scripts-adopter -h scripts-dev -m "$message"
+          base_branch="scripts-adopter"
+          branch_to_merge="scripts-dev"
+          gh pr create -B $base_branch -H $branch_to_merge --title 'Merge $branch_to_merge into $base_branch' --body '$message'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
