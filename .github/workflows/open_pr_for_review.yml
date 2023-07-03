@@ -6,7 +6,7 @@ on:
       - scripts-dev
 
 jobs:
-  open-pr:
+  open-pr-for-review:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
           result=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open")
           if [ -z "$result" ]; then
             echo "No PR found, creating a new one"
-            gh pr create -B $base_branch -H $branch_to_merge --title 'Merge $branch_to_merge into $base_branch' --body '$message'
+            gh pr create -B $base_branch -H $branch_to_merge --title "Review changes from $branch_to_merge to $base_branch" --body "$message"
           else
             echo "PR already exists, skipping gh pr create"
             exit 0
