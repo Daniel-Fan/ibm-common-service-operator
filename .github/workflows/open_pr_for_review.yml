@@ -1,0 +1,27 @@
+name: Open PR from the scripts-dev branch to the scripts-adopter branch
+
+on:
+  push:
+    branches:
+      - scripts-dev
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Create PR
+        run: |
+          git checkout -b scripts-dev
+          git push origin scripts-dev
+          timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+          message="common service installer automation on $timestamp"
+          hub pull-request -b scripts-adopter -h scripts-dev -m "$message"
