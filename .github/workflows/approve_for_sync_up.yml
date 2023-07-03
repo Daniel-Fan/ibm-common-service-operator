@@ -1,0 +1,29 @@
+name: Sync up from the scripts-dev branch to the scripts-adopter branch
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Push to scripts-adopter branch
+        if: |
+          ${{ github.event.label.name == 'ok-to-sync' }} &&
+          ${{ github.event.pull_request.head.ref == 'scripts-dev' }} &&
+          ${{ github.event.pull_request.base.ref == 'scripts-adopter' }}
+        run: |
+          git fetch origin scripts-dev
+          git checkout --track origin/scripts-dev
+          git push origin scripts-dev:scripts-adopter
