@@ -255,11 +255,15 @@ function install_nss() {
     is_sub_exist "ibm-namespace-scope-operator" "$OPERATOR_NS"
     if [ $? -eq 0 ]; then
         warning "There is an ibm-namespace-scope-operator subscription already deployed\n"
-    else
-        create_subscription "ibm-namespace-scope-operator" "$OPERATOR_NS" "$CHANNEL" "ibm-namespace-scope-operator" "${SOURCE}" "${SOURCE_NS}" "${INSTALL_MODE}"
+        IS_UPGRADE=1
     fi
+    create_subscription "ibm-namespace-scope-operator" "$OPERATOR_NS" "$CHANNEL" "ibm-namespace-scope-operator" "${SOURCE}" "${SOURCE_NS}" "${INSTALL_MODE}"
 
-    wait_for_operator "$OPERATOR_NS" "ibm-namespace-scope-operator"
+    if [ $IS_UPGRADE -eq 1 ]; then
+        wait_for_operator_upgrade "$OPERATOR_NS" "ibm-common-service-operator" $CHANNEL $INSTALL_MODE
+    else
+        wait_for_operator "$OPERATOR_NS" "ibm-common-service-operator"
+    fi
 
     # namespaceMembers should at least have Bedrock operators' namespace
     local ns=$(cat <<EOF
@@ -400,11 +404,15 @@ function install_cs_operator() {
     is_sub_exist "ibm-common-service-operator" "$OPERATOR_NS"
     if [ $? -eq 0 ]; then
         info "There is an ibm-common-service-operator Subscription already\n"
-    else
-        create_subscription "ibm-common-service-operator" "$OPERATOR_NS" "$CHANNEL" "ibm-common-service-operator" "${SOURCE}" "${SOURCE_NS}" "${INSTALL_MODE}"
-        sleep 120
+        IS_UPGRADE=1
     fi
-    wait_for_operator "$OPERATOR_NS" "ibm-common-service-operator"
+    
+    create_subscription "ibm-common-service-operator" "$OPERATOR_NS" "$CHANNEL" "ibm-common-service-operator" "${SOURCE}" "${SOURCE_NS}" "${INSTALL_MODE}"
+    if [ $IS_UPGRADE -eq 1 ]; then
+        wait_for_operator_upgrade "$OPERATOR_NS" "ibm-common-service-operator" $CHANNEL $INSTALL_MODE
+    else
+        wait_for_operator "$OPERATOR_NS" "ibm-common-service-operator"
+    fi
     accept_license "commonservice" "$OPERATOR_NS" "common-service"
     wait_for_nss_patch "$OPERATOR_NS" 
     wait_for_cs_webhook "$OPERATOR_NS" "ibm-common-service-webhook"
