@@ -9,7 +9,7 @@ on:
       - reopened
 
 jobs:
-  push:
+  push-for-sync-up:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,8 @@ jobs:
         if: |
           ${{ github.event.label.name == 'ok-to-sync' }} &&
           ${{ github.event.pull_request.head.ref == 'scripts-dev' }} &&
-          ${{ github.event.pull_request.base.ref == 'scripts-adopter' }}
+          ${{ github.event.pull_request.base.ref == 'scripts-adopter' }} &&
+          !contains(join(',', github.event.pull_request.labels.*.name), 'do-not-merge')
         run: |
           git fetch origin scripts-dev
           git checkout --track origin/scripts-dev
