@@ -25,10 +25,8 @@ jobs:
           message="common service installer automation on $timestamp"
           base_branch="scripts-adopter"
           branch_to_merge="scripts-dev"
-          # if a PR already exists, skip gh pr create
-          result=$(gh pr list -B $base_branch -H $branch_to_merge)
-          echo $result
-          if [[ $result == *"No pull"* ]]; then
+          result=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open")
+          if [ -z "$result" ]; then
             echo "No PR found, creating a new one"
             gh pr create -B $base_branch -H $branch_to_merge --title 'Merge $branch_to_merge into $base_branch' --body '$message'
           else
