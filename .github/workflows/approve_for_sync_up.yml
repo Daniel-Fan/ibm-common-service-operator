@@ -2,6 +2,8 @@ name: Sync up from the scripts-dev branch to the scripts-adopter branch
 
 on:
   pull_request:
+    branches:
+      - scripts-adopter
     types:
       - labeled
       - opened
@@ -23,10 +25,10 @@ jobs:
 
       - name: Push to scripts-adopter branch
         if: |
-          ${{ github.event.label.name == 'ok-to-sync' }} &&
-          ${{ github.event.pull_request.head.ref == 'scripts-dev' }} &&
-          ${{ github.event.pull_request.base.ref == 'scripts-adopter' }} &&
-          !contains(join(',', github.event.pull_request.labels.*.name), 'do-not-merge')
+          contains(github.event.pull_request.labels.*.name, 'ok-to-sync') &&
+          !contains(join(',', github.event.pull_request.labels.*.name), 'do-not-merge') &&
+          github.event.pull_request.head.ref == 'scripts-dev' &&
+          github.event.pull_request.base.ref == 'scripts-adopter'
         run: |
           git fetch origin scripts-dev
           git checkout --track origin/scripts-dev
