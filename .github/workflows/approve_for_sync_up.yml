@@ -24,5 +24,6 @@ jobs:
           ${{ github.event.pull_request.head.ref == 'scripts-dev' }} &&
           ${{ github.event.pull_request.base.ref == 'scripts-adopter' }}
         run: |
+          git fetch origin scripts-dev
           git checkout --track origin/scripts-dev
           git push origin scripts-dev:scripts-adopter
