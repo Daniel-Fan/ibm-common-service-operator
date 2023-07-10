@@ -301,7 +301,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-cert-manager-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -310,7 +309,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-iam-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -319,7 +317,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-healthcheck-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -337,7 +334,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-management-ingress-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -346,7 +342,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-ingress-nginx-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -355,7 +350,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - name: ibm-auditlogging-operator
     namespace: "{{ .ServicesNs }}"
     channel: v3.23
@@ -373,7 +367,6 @@ spec:
     installPlanApproval: {{ .ApprovalMode }}
     sourceName: {{ .CatalogSourceName }}
     sourceNamespace: "{{ .CatalogSourceNs }}"
-    installMode: no-op
   - channel: v3.23
     name: ibm-monitoring-grafana-operator
     namespace: "{{ .ServicesNs }}"
