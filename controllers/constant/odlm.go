@@ -18,9 +18,8 @@ package constant
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"html/template"
+	"text/template"
 
 	utilyaml "github.com/ghodss/yaml"
 
@@ -1242,7 +1241,7 @@ func ConcatenateRegistries(baseRegistryTemplate, insertedRegistryTemplate string
 	newOperators = append(newOperators, insertedRegistry.Spec.Operators...)
 
 	baseRegistry.Spec.Operators = newOperators
-	opregBytes, err := json.Marshal(baseRegistry)
+	opregBytes, err := utilyaml.Marshal(baseRegistry)
 	if err != nil {
 		return "", err
 	}
@@ -1278,7 +1277,7 @@ func ConcatenateConfigs(baseConfigTemplate, insertedConfigTemplate string, data 
 	newServices = append(newServices, insertedConfig.Spec.Services...)
 
 	baseConfig.Spec.Services = newServices
-	opconBytes, err := json.Marshal(baseConfig)
+	opconBytes, err := utilyaml.Marshal(baseConfig)
 	if err != nil {
 		return "", err
 	}
