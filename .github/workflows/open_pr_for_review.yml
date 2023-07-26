@@ -28,7 +28,8 @@ jobs:
           result=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open")
           if [ -z "$result" ]; then
             echo "No PR found, creating a new one"
-            gh pr create -B $base_branch -H $branch_to_merge --title "Review changes from $branch_to_merge to $base_branch" --body "$message"
+            pr_url=$(gh pr create -B $base_branch -H $branch_to_merge --title "Review changes from $branch_to_merge to $base_branch" --body "$message" | grep -oP 'https:\/\/github\.com\/.*\/pull\/\K\d+')
+            echo "::set-output name=pr_url::$pr_url"
           else
             echo "PR already exists, skipping gh pr create"
             exit 0
@@ -39,7 +40,7 @@ jobs:
       - name: Add label to the PR
         if: steps.create_pr.outputs.result != 'false'
         run: |
-          pr_number=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open" --json number | jq -r '.[0].number')
+          pr_number=$(echo "${{ steps.create_pr.outputs.pr_url }}" | cut -d'/' -f6)
           gh pr edit $pr_number --add-label "do-not-merge/hold"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
