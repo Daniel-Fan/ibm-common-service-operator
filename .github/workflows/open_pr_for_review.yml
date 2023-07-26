@@ -35,3 +35,11 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add label to the PR
+        if: steps.create_pr.outputs.result != 'false'
+        run: |
+          pr_number=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open" --json number | jq -r '.[0].number')
+          gh pr edit $pr_number --add-label "do-not-merge/hold"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
