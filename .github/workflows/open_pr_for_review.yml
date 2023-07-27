@@ -29,8 +29,9 @@ jobs:
           result=$(gh pr list --search "base:scripts-adopter head:scripts-dev is:open")
           if [ -z "$result" ]; then
             echo "No PR found, creating a new one"
-            pr_url=$(gh pr create -B $base_branch -H $branch_to_merge --title "Review changes from $branch_to_merge to $base_branch" --body "$message" | jq -r '.url')
-            pr_number=$(echo "$pr_url" | awk -F'/' '{print $NF}')
+            pr_info=$(gh pr create -B $base_branch -H $branch_to_merge --title "Review changes from $branch_to_merge to $base_branch" --body "$message" | jq -r '.url, .number')
+            pr_url=$(echo "$pr_info" | sed -n 1p)
+            pr_number=$(echo "$pr_info" | sed -n 2p)
             echo "new_created=1" >> $GITHUB_OUTPUT
           else
             echo "PR already exists, skipping gh pr create"
