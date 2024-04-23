@@ -1,7 +1,7 @@
+name: cherry-pick.yaml
+
 on:
   pull_request_target:
-    branches:
-      - **
     types: ["closed", "labeled"]
 
 jobs:
@@ -17,7 +17,8 @@ jobs:
         uses: xealth/cherry-pick-action@v1.0.0
         with:
           allowUserToSpecifyBranchViaLabel: 'true'
-          labelPatternRequirement: 'cherry-pick '
+          labelPatternRequirement: 'cherry-pick release'
+          userBranchPrefix: 'release-'
           labels: |
             cherry-pick
 env:
