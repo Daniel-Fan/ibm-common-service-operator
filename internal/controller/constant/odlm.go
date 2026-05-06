@@ -2488,9 +2488,8 @@ spec:
         name: common-service-db-pg-migration-sa
         labels:
           app: cpfs-pg-migrator
-        data:
-          imagePullSecrets:
-            - name: {{ .ImagePullSecret }}
+        imagePullSecrets:
+          - name: {{ .ImagePullSecret }}
       - apiVersion: rbac.authorization.k8s.io/v1
         kind: Role
         name: common-service-db-pg-migration-role
